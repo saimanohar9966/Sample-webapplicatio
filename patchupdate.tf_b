@@ -1,0 +1,46 @@
+resource "aws_ssm_patch_baseline" "al_2017_09" {
+  name             = "Amazon-Linux-2017.09"
+  description      = "My patch repository for Amazon Linux 2017.09"
+  operating_system = "AMAZON_LINUX2"
+
+  approval_rule {
+      approve_after_days  = 7
+      compliance_level    = "CRITICAL"
+      enable_non_security = false
+        {
+          name   = "PRODUCT"
+          values = ["AmazonLinux2", "AmazonLinux2.0"]
+        },
+        {
+          name   = "CLASSIFICATION"
+          values = ["Security"]
+        },
+        {
+          name   = "SEVERITY"
+          values = ["Critical"]
+        }
+    }
+
+  source {
+    name          = "My-AL2017.09"
+    products      = ["AmazonLinux2017.09"]
+    configuration = <<EOF
+[amzn-main]
+name=amzn-main-Base
+mirrorlist=http://repo./$awsregion./$awsdomain//$releasever/main/mirror.list
+mirrorlist_expire=300
+metadata_expire=300
+priority=10
+failovermethod=priority
+fastestmirror_enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-amazon-ga
+enabled=1
+retries=3
+timeout=5
+report_instanceid=yes
+EOF
+  }
+}
+
+
